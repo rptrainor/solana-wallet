@@ -1,215 +1,139 @@
-// src/machines/solanaWalletMachine.ts
-import { createMachine, assign, setup } from "xstate";
-import type Solflare from "@solflare-wallet/sdk";
+import { createMachine, assign, fromPromise, setup } from "xstate";
+import Solflare from "@solflare-wallet/sdk";
 import {
-  Connection,
-  type PublicKey,
-  Transaction,
-  SystemProgram,
+	Connection,
+	type PublicKey,
+	Transaction,
+	SystemProgram,
 } from "@solana/web3.js";
 import { getConnection } from "../utils/solanaConnection";
 
 export interface SolanaWalletContext {
-  wallet: Solflare | null;
-  balance: number;
-  transactionSignature: string;
-  publicKey: PublicKey | null;
+	wallet: Solflare | null;
+	balance: number;
+	transactionSignature: string;
+	publicKey: PublicKey | null;
 }
 
 export type SolanaWalletEvent =
-  | { type: "CONNECT" }
-  | { type: "DISCONNECT" }
-  | { type: "SEND_TRANSACTION" }
-  | { type: "RETRY" };
+	| { type: "CONNECT" }
+	| { type: "DISCONNECT" }
+	| { type: "SEND_TRANSACTION" }
+	| { type: "RETRY" };
 
-const solanaWalletMachine = setup({
-  types: {
-    context: {} as SolanaWalletContext,
-    events: {} as
-      | { type: 'CONNECT'; }
-      | { type: 'DISCONNECT'; }
-      | { type: 'SEND_TRANSACTION'; }
-      | { type: 'RETRY'; }
-  },
-  id: "solanaWallet",
-  initial: "disconnected",
-  context: {
-  wallet: new Solflare(),
-  balance: 0,
-  transactionSignature: "",
-  publicKey: null,
-},
-  states:
-  {
-    CONNECT: "connecting",
-	,
-	,
-  connecting:
-    src: "connectWallet", onDone;
-	:
-target: "connected", actions;
-	: assign(
-  publicKey: (_, event) => event?.data?.publicKey,
-),
-	,
-  onError:
-target: "disconnected",
-	,
-	,
-	,
-  connected:
-entry: "updateBalance", on;
-	:
-DISCONNECT: "disconnecting", SEND_TRANSACTION;
-	: "sendingTransaction",
-	,
-	,
-  disconnecting:
-src: "disconnectWallet", onDone;
-	:
-target: "disconnected", actions;
-	: assign(
-  balance: 0, publicKey;
-	: null,
-	),
-	,
-onError:
-target: "connected",
-	,
-	,
-	,
-  sendingTransaction:
-src: "sendTransaction", onDone;
-	:
-target: "connected", actions;
-	: assign(
-  transactionSignature: (_, event) => event?.data.signature,
-),
-	,
-  onError:
-target: "connected",
-	,
-	,
-	,
-  error:
-RETRY: "connected",
-	,
-	,
-}
-,
-})
-// const solanaWalletMachine = createMachine<
-// 	SolanaWalletContext,
-// 	SolanaWalletEvent
-// >(
-// 	{
-// 		id: "solanaWallet",
-// 		initial: "disconnected",
-// 		context: {
-// 			wallet: new Solflare(),
-// 			balance: 0,
-// 			transactionSignature: "",
-// 			publicKey: null,
-// 		},
-// 		states: {
-// 			disconnected: {
-// 				on: {
-// 					CONNECT: "connecting",
-// 				},
-// 			},
-// 			connecting: {
-// 				invoke: {
-// 					src: "connectWallet",
-// 					onDone: {
-// 						target: "connected",
-// 						actions: assign({
-// 							publicKey: (_, event) => event?.data?.publicKey,
-// 						}),
-// 					},
-// 					onError: {
-// 						target: "disconnected",
-// 					},
-// 				},
-// 			},
-// 			connected: {
-// 				entry: "updateBalance",
-// 				on: {
-// 					DISCONNECT: "disconnecting",
-// 					SEND_TRANSACTION: "sendingTransaction",
-// 				},
-// 			},
-// 			disconnecting: {
-// 				invoke: {
-// 					src: "disconnectWallet",
-// 					onDone: {
-// 						target: "disconnected",
-// 						actions: assign({
-// 							balance: 0,
-// 							publicKey: null,
-// 						}),
-// 					},
-// 					onError: {
-// 						target: "connected",
-// 					},
-// 				},
-// 			},
-// 			sendingTransaction: {
-// 				invoke: {
-// 					src: "sendTransaction",
-// 					onDone: {
-// 						target: "connected",
-// 						actions: assign({
-// 							transactionSignature: (_, event) => event?.data.signature,
-// 						}),
-// 					},
-// 					onError: {
-// 						target: "connected",
-// 					},
-// 				},
-// 			},
-// 			error: {
-// 				on: {
-// 					RETRY: "connected",
-// 				},
-// 			},
-// 		},
-// 	},
-// 	{
-// 		services: {
-// 			connectWallet: async () => {
-// 				const wallet = new Solflare();
-// 				await wallet.connect();
-// 				return { publicKey: wallet.publicKey };
-// 			},
-// 			disconnectWallet: async (context) => {
-// 				await context.wallet?.disconnect();
-// 			},
-// 			sendTransaction: async (context) => {
-// 				const connection = getConnection();
-// 				const transaction = new Transaction().add(
-// 					SystemProgram.transfer({
-// 						fromPubkey: context.publicKey!,
-// 						toPubkey: context.publicKey!,
-// 						lamports: 0,
-// 					}),
-// 				);
-// 				const signature =
-// 					await context.wallet!.signAndSendTransaction(transaction);
-// 				await connection.confirmTransaction(signature, "confirmed");
-// 				return { signature };
-// 			},
-// 		},
-// 		actions: {
-// 			updateBalance: assign(async (context) => {
-// 				if (context.publicKey) {
-// 					const connection = getConnection();
-// 					const newBalance = await connection.getBalance(context.publicKey);
-// 					return { balance: newBalance / 1e9 }; // Convert lamports to SOL
-// 				}
-// 				return { balance: 0 };
-// 			}),
-// 		},
-// 	},
-// );
+export const solanaWalletMachine = setup({
+	types: {
+		context: {} as SolanaWalletContext,
+		events: {} as
+      | { type: "CONNECTING" }
+			| { type: "CONNECT" }
+			| { type: "DISCONNECT" }
+			| { type: "SEND_TRANSACTION" }
+			| { type: "RETRY" },
+	},
+	actors: {
+    connectWallet: fromPromise(async () => {
+      const wallet = new Solflare();
+      await wallet.connect();
+      if (!wallet.publicKey) throw new Error('No public key found');
+      const connection = getConnection()
+      const newBalance = await connection.getBalance(wallet?.publicKey)
+      return { publicKey: wallet.publicKey, wallet, balance: newBalance / 1e9 };
+    }),
+    sendTransaction: fromPromise(async ({ input }: { input: { publicKey: PublicKey | null; wallet: Solflare | null } }) => {
+      if (!input?.publicKey) throw new Error('No public key found');
+      const connection = getConnection();
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: input.publicKey,
+          toPubkey: input.publicKey,
+          lamports: 0,
+        })
+      );
+      transaction.recentBlockhash = blockhash;
+      transaction.lastValidBlockHeight = lastValidBlockHeight;
+
+      if (!input?.wallet) throw new Error('No wallet found');
+      try {
+        const signature = await input.wallet.signAndSendTransaction(transaction);
+        await connection.confirmTransaction(
+          {
+            signature,
+            blockhash,
+            lastValidBlockHeight,
+          },
+          'confirmed'
+        );
+        return { signature };
+      } catch (error) {
+        console.error('Transaction failed:', error);
+        throw error;
+      }
+    }),
+	},
+	actions: {
+    disconnectWallet({ context }) {
+      return context.wallet?.disconnect().then(() => ({ wallet: null }));
+    },
+	},
+}).createMachine({
+	context: {
+		wallet: new Solflare(),
+		balance: 0,
+		transactionSignature: "",
+		publicKey: null,
+	},
+	id: "SolanaWalletMachine",
+	initial: "DISCONNECTED",
+	states: {
+		DISCONNECTED: {
+			on: {
+				CONNECT: "CONNECTING",
+			},
+		},
+		CONNECTING: {
+			invoke: {
+				src: "connectWallet",
+				onDone: {
+					target: "CONNECTED",
+				},
+				onError: {
+					target: "DISCONNECTED",
+				},
+			},
+		},
+		CONNECTED: {
+			on: {
+				DISCONNECT: {
+					target: "DISCONNECTED",
+					actions: "disconnectWallet",
+				},
+				SEND_TRANSACTION: "SENDING_TRANSACTION",
+			},
+		},
+		SENDING_TRANSACTION: {
+			invoke: {
+        id: "sendTransaction",
+				src: "sendTransaction",
+        input: ({ context }) => ({
+          publicKey: context.publicKey,
+          wallet: context.wallet,
+        }),
+				onDone: {
+					target: "CONNECTED",
+				},
+				onError: {
+					target: "CONNECTED",
+				},
+			},
+		},
+		ERROR: {
+			on: {
+				RETRY: "CONNECTED",
+			},
+		},
+	},
+});
 
 export default solanaWalletMachine;

@@ -1,7 +1,9 @@
-// src/store/solanaWalletStore.ts
+"use client";
+
 import { create } from "zustand";
 import { useMachine } from "@xstate/react";
-import solanaWalletMachine, {
+import {
+  solanaWalletMachine,
 	type SolanaWalletContext,
 	type SolanaWalletEvent,
 } from "../machines/solanaWalletMachine";
@@ -16,10 +18,9 @@ type SolanaWalletStoreState = {
 	send: (event: SolanaWalletEvent) => void;
 };
 
-export const useSolanaWalletStore = create<SolanaWalletStoreState>((set) => {
+export const useSolanaWalletStore = create<SolanaWalletStoreState>()(() => {
 	const [state, send] = useMachine(solanaWalletMachine);
 
-	// Transform XState state to Zustand-compatible state
 	const zustandState: SolanaWalletStoreState = {
 		state: {
 			context: state.context,

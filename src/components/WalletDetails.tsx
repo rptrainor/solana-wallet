@@ -1,4 +1,5 @@
-// src/components/WalletDetails.tsx
+"use client";
+
 import type React from "react";
 import { useSolanaWalletStore } from "~/stores/solanaWalletStore";
 
