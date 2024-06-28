@@ -1,23 +1,33 @@
-"use client";
+"use client"
 
 import type React from "react";
-import { useSolanaWalletStore } from "~/stores/solanaWalletStore";
+import { useEffect } from "react";
+import { useSolanaWallet } from "~/context/SolanaWalletContext";
 
 const WalletDetails: React.FC = () => {
-	const { state, send } = useSolanaWalletStore();
+	const { context, value, send } = useSolanaWallet();
+
+	useEffect(() => {
+		console.log({
+			context,
+			value,
+		});
+	}, [context, value]);
 
 	return (
 		<div>
-			<button type="button" onClick={() => send({ type: "CONNECT" })}>Connect Wallet</button>
-			<button type="button"  onClick={() => send({ type: "DISCONNECT" })}>
+			<button type="button" onClick={() => send({ type: "CONNECT" })}>
+				Connect Wallet
+			</button>
+			<button type="button" onClick={() => send({ type: "DISCONNECT" })}>
 				Disconnect Wallet
 			</button>
-			<button type="button"  onClick={() => send({ type: "SEND_TRANSACTION" })}>
+			<button type="button" onClick={() => send({ type: "SENDING_TRANSACTION" })}>
 				Send Test Transaction
 			</button>
-			<div>Balance: {state.context.balance} SOL</div>
-			<div>Transaction Signature: {state.context.transactionSignature}</div>
-			<div>Status: {state.value}</div>
+			<div>Balance: {context.balance} SOL</div>
+			<div>Transaction Signature: {context.transactionSignature}</div>
+			<div>Status: {value}</div>
 		</div>
 	);
 };

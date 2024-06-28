@@ -1,17 +1,14 @@
+"use client";
+
 import type React from "react";
-
-import WalletDetails from "../components/WalletDetails";
-// import { ToastContainer } from "react-toastify";
-
-import "react-toastify/dist/ReactToastify.css";
+import { SolanaWalletProvider } from "~/context/SolanaWalletContext";
+import WalletDetails from "~/components/WalletDetails";
 
 const App: React.FC = () => {
 	return (
-		<div className="App">
-			{/* <ToastContainer /> */}
-			<h1>Solana Wallet Connector</h1>
+		<SolanaWalletProvider>
 			<WalletDetails />
-		</div>
+		</SolanaWalletProvider>
 	);
 };
 
