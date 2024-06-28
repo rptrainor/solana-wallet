@@ -1,4 +1,4 @@
-import { assign, fromPromise, setup } from "xstate";
+import { createMachine, assign, fromPromise, setup } from "xstate";
 import Solflare from "@solflare-wallet/sdk";
 import {
 	Connection,
@@ -55,30 +55,29 @@ export const solanaWalletMachine = setup({
 				if (!toPublicKey) throw new Error("No toPublicKey found");
 
 				const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-				console.log("connection", connection);
+
 				// Fetch recent blockhash
 				const { blockhash } = await connection.getLatestBlockhash();
-				console.log("blockhash", blockhash);
+
 				const transferInstruction = SystemProgram.transfer({
 					fromPubkey: publicKey,
 					toPubkey: toPublicKey,
 					lamports: amount * LAMPORTS_PER_SOL,
 				});
-				console.log("transferInstruction", transferInstruction);
+
 				const transaction = new Transaction().add(transferInstruction);
 				transaction.recentBlockhash = blockhash;
 				transaction.feePayer = publicKey;
-				console.log("transaction", transaction);
+
 				try {
 					// Sign the transaction using the Solflare wallet
 					const signedTransaction = await wallet.signTransaction(transaction);
-					console.log("signedTransaction", signedTransaction);
+
 					// Convert the signed transaction to Buffer before sending
 					const serializedTransaction = Buffer.from(signedTransaction.serialize());
-					console.log("serializedTransaction", serializedTransaction);
+
 					// Send and confirm the signed transaction
 					const signature = await sendAndConfirmRawTransaction(connection, serializedTransaction);
-					console.log("signature", signature);
 					return { signature };
 				} catch (error) {
 					console.error("Transaction failed:", error);
