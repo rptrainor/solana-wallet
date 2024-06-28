@@ -51,25 +51,12 @@ export const solanaWalletMachine = setup({
 	},
 	actors: {
 		connectWallet: fromPromise(async () => {
-			console.log("connectWallet");
-			const wallet = new Solflare();
-			console.log("wallet", wallet);
+			const wallet = new Solflare({network: 'devnet' });
 			await wallet.connect();
-			console.log("wallet.publicKey", wallet.publicKey);
 			if (!wallet.publicKey) throw new Error("No public key found");
-			console.log("wallet.publicKey 2", wallet.publicKey);
 			const connection = getConnection();
-			console.log("connection", connection);
 			const newBalance = await connection.getBalance(wallet.publicKey);
-			console.log("newBalance", newBalance);
-			const data = {
-				publicKey: wallet.publicKey,
-				wallet,
-				balance: newBalance / 1e9,
-			};
-			assign({ publicKey: wallet.publicKey, wallet, balance: newBalance / 1e9 });
-			console.log("data", data);
-			return data;
+			return { publicKey: wallet.publicKey, wallet, balance: newBalance / 1e9 };
 		}),
 		sendTransaction: fromPromise(
 			async ({
@@ -88,6 +75,7 @@ export const solanaWalletMachine = setup({
 						lamports: 0,
 					}),
 				);
+				transaction.feePayer = input.publicKey; // Set the fee payer
 				transaction.recentBlockhash = blockhash;
 				transaction.lastValidBlockHeight = lastValidBlockHeight;
 
@@ -118,7 +106,7 @@ export const solanaWalletMachine = setup({
 	},
 }).createMachine({
 	context: {
-		wallet: new Solflare(),
+		wallet: new Solflare({ network: 'devnet' }),
 		balance: 0,
 		transactionSignature: "",
 		publicKey: null,
@@ -138,11 +126,29 @@ export const solanaWalletMachine = setup({
 				onDone: {
 					target: "CONNECTED",
 					actions: assign({
-						publicKey: ({context, event}: { context: SolanaWalletContext, event: ConnectWalletDoneEvent }) =>  context.publicKey || event.output.publicKey,
-						wallet: ({context, event}: { context: SolanaWalletContext, event: ConnectWalletDoneEvent }) => event.output.wallet ?? context.wallet,
-						balance: ({context, event}: { context: SolanaWalletContext, event: ConnectWalletDoneEvent }) => event.output.balance ??context.balance,
-					})
-				},	
+						publicKey: ({
+							context,
+							event,
+						}: {
+							context: SolanaWalletContext;
+							event: ConnectWalletDoneEvent;
+						}) => context.publicKey || event.output.publicKey,
+						wallet: ({
+							context,
+							event,
+						}: {
+							context: SolanaWalletContext;
+							event: ConnectWalletDoneEvent;
+						}) => event.output.wallet ?? context.wallet,
+						balance: ({
+							context,
+							event,
+						}: {
+							context: SolanaWalletContext;
+							event: ConnectWalletDoneEvent;
+						}) => event.output.balance ?? context.balance,
+					}),
+				},
 				onError: {
 					target: "DISCONNECTED",
 				},
@@ -168,8 +174,14 @@ export const solanaWalletMachine = setup({
 				onDone: {
 					target: "CONNECTED",
 					actions: assign({
-						transactionSignature: ({context, event}: { context: SolanaWalletContext, event: SendTransactionDoneEvent }) => context.transactionSignature || event.output.signature,
-					})
+						transactionSignature: ({
+							context,
+							event,
+						}: {
+							context: SolanaWalletContext;
+							event: SendTransactionDoneEvent;
+						}) => context.transactionSignature || event.output.signature,
+					}),
 				},
 				onError: {
 					target: "CONNECTED",
