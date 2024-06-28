@@ -12,10 +12,12 @@
     "@solana/web3.js": "^1.93.2",
     "@solflare-wallet/sdk": "^1.4.2",
     "@xstate/react": "^4.1.1",
+    "buffer": "^6.0.3",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-toastify": "^10.0.5",
+    "tweetnacl": "^1.0.3",
     "xstate": "^5.14.0",
     "zustand": "^4.5.2"
   },

@@ -22,7 +22,10 @@ const WalletDetails: React.FC = () => {
 			<button type="button" onClick={() => send({ type: "DISCONNECT" })}>
 				Disconnect Wallet
 			</button>
-			<button type="button" onClick={() => send({ type: "SENDING_TRANSACTION" })}>
+			<button
+				type="button"
+				onClick={() => send({ type: "SENDING_TRANSACTION" })}
+			>
 				Send Test Transaction
 			</button>
 			<div>Balance: {context.balance} SOL</div>

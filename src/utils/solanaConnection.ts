@@ -1,5 +1,8 @@
-import { Connection, clusterApiUrl } from '@solana/web3.js';
+import { Connection } from "@solana/web3.js";
+
+// Define the Solana devnet endpoint
+const DEVNET_ENDPOINT = "https://api.devnet.solana.com";
 
 export const getConnection = () => {
-  return new Connection(clusterApiUrl('devnet'), 'confirmed')
-}
+  return new Connection(DEVNET_ENDPOINT);
+};
