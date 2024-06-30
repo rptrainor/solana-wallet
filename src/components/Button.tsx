@@ -6,7 +6,7 @@ const Button: FC<ComponentProps<"button">> = ({ children, ...restOfProps }) => {
     <button
       {...restOfProps}
       type="button"
-      className="group/button relative inline-flex items-center justify-center overflow-hidden bg-yellow-500 p-2 w-8 h-8 rounded-full text-xs font-normal text-black transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-slate-600/30 border-black border-2"
+      className="group/button relative inline-flex items-center justify-center overflow-hidden bg-yellow-500 p-2 w-8 h-8 rounded-full text-xs font-normal text-black transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30 drop-shadow-2xl border-black border-2"
     >
 
       <span className="text-lg font-bold">
