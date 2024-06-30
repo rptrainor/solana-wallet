@@ -1,4 +1,8 @@
+import { useSolanaWallet } from "~/context/SolanaWalletContext";
+
 const Hero = () => {
+  const { send } = useSolanaWallet();
+
   return (
     <div className="relative isolate overflow-hidden bg-slate-800 rounded">
 
@@ -13,6 +17,7 @@ const Hero = () => {
           <div className="mt-10 gap-y-4 items-start flex sm:flex-row flex-col sm:items-center gap-x-6">
             <button
               type="button"
+              onClick={() => send({ type: "CONNECT" })}
               className="group/button relative inline-flex items-center justify-center overflow-hidden bg-yellow-500 py-1 px-2 rounded-full text-xs font-normal text-black transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30 drop-shadow-2xl border-black border-2"
             >
               <span className="text-lg font-bold">

@@ -10,7 +10,7 @@ import {
 
 export interface SolanaWalletContext {
 	wallet: Solflare | null;
-	balance: number;
+	balance: number | null;
 	transactionSignature: string;
 }
 
@@ -36,7 +36,7 @@ interface SendTransactionDoneEvent {
 	};
 }
 
-const SOLANA_DEVNET = "https://api.devnet.solana.com/";
+const SOLANA_DEVNET = "https://api.testnet.solana.com/";
 
 export const solanaWalletMachine = setup({
 	types: {
@@ -107,7 +107,7 @@ export const solanaWalletMachine = setup({
 }).createMachine({
 	context: {
 		wallet: new Solflare({ network: "devnet" }),
-		balance: 0,
+		balance: null,
 		transactionSignature: "",
 		publicKey: null,
 	},
