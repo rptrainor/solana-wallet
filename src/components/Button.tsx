@@ -1,7 +1,6 @@
 import type { ComponentProps, FC } from "react";
 
 const Button: FC<ComponentProps<"button">> = ({ children, ...restOfProps }) => {
-
   return (
     <button
       {...restOfProps}

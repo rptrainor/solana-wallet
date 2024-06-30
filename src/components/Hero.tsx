@@ -6,7 +6,7 @@ const Hero = () => {
   return (
     <div className="relative isolate overflow-hidden bg-slate-800 rounded">
 
-      <div className="mx-auto max-w-7xl xs:px-6 pb-12 pt-10 lg:flex lg:px-8">
+      <div className="mx-auto max-w-7xl xs:px-6 pb-12 xs:pt-10 lg:flex lg:px-8">
         <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
           <h1 className="mt-10 text-4xl font-bold tracking-tight text-slate-200 sm:text-6xl text-balance">
             Send &#38; Receive SOL
@@ -28,10 +28,10 @@ const Hero = () => {
               </div>
             </button>
             <a href="https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic" 
-            className="group/button relative inline-flex items-center justify-center overflow-hidden bg-slate-800 py-1 px-2 rounded-full text-xs font-normal text-white transition-all duration-300 ease-in-out hover:scale-105 "
+            className="group/button relative inline-flex items-center justify-center overflow-hidden bg-slate-800 py-1 px-2 rounded-full text-xs font-normal text-white transition-all duration-300 ease-in-out hover:scale-105"
             >
               <span className="text-lg font-bold">
-              Create a wallet <span aria-hidden="true">→</span>
+              Get a wallet <span aria-hidden="true">→</span>
               </span>
             </a>
           </div>
