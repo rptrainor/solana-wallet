@@ -28,18 +28,18 @@ const WalletDetails: FC = () => {
 						{value !== "ERROR" && value !== "DISCONNECTED" && (
 							<dl className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center mx-auto max-w-4xl w-full">
 								{context.balance !== null && (
-									<div className="flex flex-col bg-white/5 p-8 w-full">
+									<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
 										<dd className="order-first text-lg font-semibold tracking-tight text-white">{context.balance} SOL</dd>
 										<dt className="text-sm font-semibold leading-6 text-gray-300">balance</dt>
 									</div>
 								)}
 								{value !== "CONNECTING" && context.transactionSignature && (
-									<div className="flex flex-col bg-white/5 p-8">
+									<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
 										<dt className="text-sm font-semibold leading-6 text-gray-300">last transaction signature</dt>
 										<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">{context.transactionSignature}</dd>
 									</div>
 								)}
-								<div className={value === "CONNECTING" || value === 'SENDING_TRANSACTION' ? "animate-pulse rounded-md bg-slate-800/10 flex flex-col p-8" : "flex flex-col bg-white/5 p-8"}>
+								<div className={value === "CONNECTING" || value === 'SENDING_TRANSACTION' ? "animate-pulse rounded-md bg-white/5 flex flex-col xs:p-8" : "flex flex-col bg-white/5 xs:p-8 py-2 px-4"}>
 									<dt className="text-sm font-semibold leading-6 text-gray-300">connection status</dt>
 									<dd className="order-first text-lg font-semibold tracking-tight text-white break-words hyphens-auto">{value}</dd>
 								</div>
@@ -51,7 +51,7 @@ const WalletDetails: FC = () => {
 			</div>
 			<Modal open={value === "ERROR"} setOpen={() => send({ type: "RETRY" })}>
 				<div>
-					<div className="mx-auto flex h-6 w-6 xs:h-12 xs:w-12 items-center justify-center rounded-full bg-slate-100">
+					<div className="mx-auto flex h-8 w-8 xs:h-12 xs:w-12 items-center justify-center rounded-full bg-slate-300">
 						<svg
 							xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
 							aria-label='Reset network connection'
@@ -68,7 +68,7 @@ const WalletDetails: FC = () => {
 							Opps! Something went wrong
 						</DialogTitle>
 						<div className="mt-2">
-							<p className="text-xs xs:text-sm text-slate-500">
+							<p className="text-xs xs:text-sm text-slate-500 text-start sm:text-center text-balance">
 								Please try to reconnect to your wallet.
 							</p>
 						</div>
