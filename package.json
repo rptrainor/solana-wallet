@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.1",
     "@solana/web3.js": "^1.93.2",
     "@solflare-wallet/sdk": "^1.4.2",
     "@xstate/react": "^4.1.1",
