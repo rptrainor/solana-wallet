@@ -1,5 +1,3 @@
-import Button from "./Button";
-
 const Hero = () => {
   return (
     <div className="relative isolate overflow-hidden bg-slate-800 rounded">
