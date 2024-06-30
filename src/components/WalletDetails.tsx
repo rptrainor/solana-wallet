@@ -1,6 +1,6 @@
 "use client"
 
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect } from "react";
 import { DialogTitle } from "@headlessui/react";
 
 import { useSolanaWallet } from "~/context/SolanaWalletContext";
@@ -10,7 +10,6 @@ import Modal from "./Modal";
 
 const WalletDetails: FC = () => {
 	const { context, value, send } = useSolanaWallet();
-	// const [open, setOpen] = useState(true);
 
 	useEffect(() => {
 		console.log({
