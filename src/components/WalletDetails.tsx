@@ -24,7 +24,7 @@ const WalletDetails: FC = () => {
 				<div className="flex flex-col sm:flex-row-reverse gap-4">
 					<Menu />
 					<div className="flex flex-col gap-4 grow">
-						<Hero />
+						{value === "DISCONNECTED" && (<Hero />)}
 						{value !== "ERROR" && value !== "DISCONNECTED" && (
 							<dl className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center mx-auto max-w-4xl w-full">
 								{context.balance !== null && (
@@ -33,15 +33,15 @@ const WalletDetails: FC = () => {
 										<dt className="text-sm font-semibold leading-6 text-gray-300">balance</dt>
 									</div>
 								)}
-								{value !== "CONNECTING" && (
+								{value !== "CONNECTING" && context.transactionSignature && (
 									<div className="flex flex-col bg-white/5 p-8">
 										<dt className="text-sm font-semibold leading-6 text-gray-300">last transaction signature</dt>
-										<dd className="order-first text-3xl font-semibold tracking-tight text-white">{context.transactionSignature}</dd>
+										<dd className="order-first text-3xl font-semibold tracking-tight text-white text-wrap break-words">{context.transactionSignature}</dd>
 									</div>
 								)}
 								<div className="flex flex-col bg-white/5 p-8">
 									<dt className="text-sm font-semibold leading-6 text-gray-300">connection status</dt>
-									<dd className="order-first text-3xl font-semibold tracking-tight text-white">{value}</dd>
+									<dd className="order-first text-3xl font-semibold tracking-tight text-white break-words">{value}</dd>
 								</div>
 							</dl>
 						)}

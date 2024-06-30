@@ -100,7 +100,7 @@ export const solanaWalletMachine = setup({
 		),
 		disconnectWallet: fromPromise(async ({ input }: { input: { wallet: Solflare | null } }) => {
 			await input?.wallet?.disconnect();
-			return { wallet: null };
+			return { wallet: null, balance: null, transactionSignature: null };
 		}),
 	},
 	actions: {},
@@ -109,7 +109,6 @@ export const solanaWalletMachine = setup({
 		wallet: new Solflare({ network: "devnet" }),
 		balance: null,
 		transactionSignature: "",
-		publicKey: null,
 	},
 	id: "SolanaWalletMachine",
 	initial: "DISCONNECTED",
@@ -142,7 +141,7 @@ export const solanaWalletMachine = setup({
 				DISCONNECT: {
 					target: "DISCONNECTING",
 				},
-				SENDING_TRANSACTION: "SENDING_TRANSACTION",
+				SEND_TRANSACTION: "SENDING_TRANSACTION",
 			},
 		},
 		DISCONNECTING: {
@@ -156,7 +155,7 @@ export const solanaWalletMachine = setup({
 					target: "DISCONNECTED",
 					actions: assign({
 						wallet: (_context, _event) => null,
-						balance: (_context, _event) => 0,
+						balance: (_context, _event) => null,
 						transactionSignature: (_context, _event) => "",
 					}),
 				},
@@ -173,7 +172,7 @@ export const solanaWalletMachine = setup({
 					wallet: context.wallet,
 				}),
 				onDone: {
-					target: "CONNECTED",
+					target: "TRANSACTION_SENT",
 					actions: assign({
 						transactionSignature: ({ context, event }) =>
 							event.output.signature || context.transactionSignature,
@@ -182,6 +181,14 @@ export const solanaWalletMachine = setup({
 				onError: {
 					target: "ERROR",
 				},
+			},
+		},
+		TRANSACTION_SENT: {
+			on: {
+				DISCONNECT: {
+					target: "DISCONNECTING",
+				},
+				SEND_TRANSACTION: "SENDING_TRANSACTION",
 			},
 		},
 		ERROR: {
