@@ -1,8 +1,7 @@
-import { createMachine, assign, fromPromise, setup } from "xstate";
+import { assign, fromPromise, setup } from "xstate";
 import Solflare from "@solflare-wallet/sdk";
 import {
 	Connection,
-	type PublicKey,
 	Transaction,
 	SystemProgram,
 	LAMPORTS_PER_SOL,
@@ -13,21 +12,20 @@ export interface SolanaWalletContext {
 	wallet: Solflare | null;
 	balance: number;
 	transactionSignature: string;
-	publicKey: PublicKey | null;
 }
 
 export type SolanaWalletEvent =
 	| { type: "CONNECT" }
 	| { type: "DISCONNECT" }
-	| { type: "SENDING_TRANSACTION" }
-	| { type: "RETRY" };
+	| { type: "SEND_TRANSACTION" }
+	| { type: "RETRY" }
 
 interface ConnectWalletDoneEvent {
 	type: "done.invoke.connectWallet";
 	data: {
-		publicKey: PublicKey;
 		wallet: Solflare;
 		balance: number;
+		connection: Connection;
 	};
 }
 
@@ -44,10 +42,9 @@ export const solanaWalletMachine = setup({
 	types: {
 		context: {} as SolanaWalletContext,
 		events: {} as
-			| { type: "CONNECTING" }
 			| { type: "CONNECT" }
 			| { type: "DISCONNECT" }
-			| { type: "SENDING_TRANSACTION" }
+			| { type: "SEND_TRANSACTION" }
 			| { type: "RETRY" }
 			| ConnectWalletDoneEvent
 			| SendTransactionDoneEvent,
@@ -61,16 +58,16 @@ export const solanaWalletMachine = setup({
 			const connection = new Connection(SOLANA_DEVNET);
 			const newBalance = await connection.getBalance(wallet.publicKey);
 
-			return { publicKey: wallet.publicKey, wallet, balance: newBalance / 1e9 };
+			return { wallet, balance: newBalance / 1e9 };
 		}),
 		sendTransaction: fromPromise(
 			async ({
 				input,
 			}: {
-				input: { publicKey: PublicKey | null; wallet: Solflare | null };
+				input: { wallet: Solflare | null };
 			}) => {
-				if (!input.publicKey) throw new Error("No public key found");
 				if (!input.wallet) throw new Error("No wallet found");
+				if (!input.wallet.publicKey) throw new Error("No public key found");
 
 				const connection = new Connection(SOLANA_DEVNET);
 				const { blockhash, lastValidBlockHeight } =
@@ -78,12 +75,12 @@ export const solanaWalletMachine = setup({
 
 				const transaction = new Transaction().add(
 					SystemProgram.transfer({
-						fromPubkey: input.publicKey,
-						toPubkey: input.publicKey,
+						fromPubkey: input.wallet.publicKey,
+						toPubkey: input.wallet.publicKey,
 						lamports: 0,
 					}),
 				);
-				transaction.feePayer = input.publicKey;
+				transaction.feePayer = input.wallet.publicKey;
 				transaction.recentBlockhash = blockhash;
 
 				try {
@@ -129,8 +126,6 @@ export const solanaWalletMachine = setup({
 				onDone: {
 					target: "CONNECTED",
 					actions: assign({
-						publicKey: ({ context, event }) =>
-							event.output.publicKey || context.publicKey,
 						wallet: ({ context, event }) =>
 							event.output.wallet || context.wallet,
 						balance: ({ context, event }) =>
@@ -161,7 +156,6 @@ export const solanaWalletMachine = setup({
 					target: "DISCONNECTED",
 					actions: assign({
 						wallet: (_context, _event) => null,
-						publicKey: (_context, _event) => null,
 						balance: (_context, _event) => 0,
 						transactionSignature: (_context, _event) => "",
 					}),
@@ -176,7 +170,6 @@ export const solanaWalletMachine = setup({
 				id: "sendTransaction",
 				src: "sendTransaction",
 				input: ({ context }) => ({
-					publicKey: context.publicKey,
 					wallet: context.wallet,
 				}),
 				onDone: {

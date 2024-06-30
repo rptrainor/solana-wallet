@@ -25,7 +25,7 @@ const SolanaWalletProvider: React.FC<SolanaWalletProviderProps> = ({
   const [state, send] = useMachine(solanaWalletMachine);
 
   return (
-    <SolanaWalletReactContext.Provider value={{ context: state.context, value: state.value as string, send }}>
+    <SolanaWalletReactContext.Provider value={{ context: state.context, value: state.value, send }}>
       {children}
     </SolanaWalletReactContext.Provider>
   );
