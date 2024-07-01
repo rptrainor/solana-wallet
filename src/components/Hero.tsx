@@ -28,7 +28,7 @@ const Hero = () => {
               </div>
             </button>
             <a href="https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic" 
-            className="group/button relative inline-flex items-center justify-center overflow-hidden bg-slate-800 py-1 px-2 rounded-full text-xs font-normal text-white transition-all duration-300 ease-in-out hover:scale-105"
+            className="group/button relative inline-flex items-center justify-center overflow-hidden bg-slate-800 py-1 px-2 rounded-full text-xs font-normal text-white transition-all duration-300 ease-in-out hover:scale-105 hover:bg-slate-500/30"
             >
               <span className="text-lg font-bold">
               Get a wallet <span aria-hidden="true">→</span>
