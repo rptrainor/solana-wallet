@@ -15,43 +15,25 @@ export interface SolanaWalletContext {
 }
 
 export type SolanaWalletEvent =
+	| { type: "DISCONNECTED" }
 	| { type: "CONNECT" }
-	| { type: "DISCONNECT" }
+	| { type: "CONNECTING" }
+	| { type: "CONNECTED" }
+	| { type: "ERROR" }
+	| { type: "DISCONNECTING" }
 	| { type: "TRANSACTION_MODAL" }
 	| { type: "CANCEL" }
 	| { type: "SENDING_TRANSACTION", data: { amount: number } }
 	| { type: "RETRY" }
-
-interface ConnectWalletDoneEvent {
-	type: "done.invoke.connectWallet";
-	data: {
-		wallet: Solflare;
-		balance: number;
-		connection: Connection;
-	};
-}
-
-interface SendTransactionDoneEvent {
-	type: "done.invoke.sendTransaction";
-	data: {
-		signature: TransactionSignature;
-	};
-}
+	| { type: "done.invoke.connectWallet"; data: { wallet: Solflare; balance: number; connection: Connection } }
+	| { type: "done.invoke.sendTransaction"; data: { signature: TransactionSignature } };
 
 const SOLANA_DEVNET = "https://api.testnet.solana.com/";
 
 export const solanaWalletMachine = setup({
 	types: {
 		context: {} as SolanaWalletContext,
-		events: {} as
-			| { type: "CONNECT" }
-			| { type: "DISCONNECT" }
-			| { type: "TRANSACTION_MODAL" }
-			| { type: "CANCEL" }
-			| { type: "SENDING_TRANSACTION", data: { amount: number } }
-			| { type: "RETRY" }
-			| ConnectWalletDoneEvent
-			| SendTransactionDoneEvent,
+		events: {} as SolanaWalletEvent,
 	},
 	actors: {
 		connectWallet: fromPromise(async () => {
