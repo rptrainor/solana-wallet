@@ -17,7 +17,9 @@ export interface SolanaWalletContext {
 export type SolanaWalletEvent =
 	| { type: "CONNECT" }
 	| { type: "DISCONNECT" }
-	| { type: "SEND_TRANSACTION" }
+	| { type: "TRANSACTION_MODAL" }
+	| { type: "CANCEL" }
+	| { type: "SENDING_TRANSACTION", data: { amount: number } }
 	| { type: "RETRY" }
 
 interface ConnectWalletDoneEvent {
@@ -44,7 +46,9 @@ export const solanaWalletMachine = setup({
 		events: {} as
 			| { type: "CONNECT" }
 			| { type: "DISCONNECT" }
-			| { type: "SEND_TRANSACTION" }
+			| { type: "TRANSACTION_MODAL" }
+			| { type: "CANCEL" }
+			| { type: "SENDING_TRANSACTION", data: { amount: number } }
 			| { type: "RETRY" }
 			| ConnectWalletDoneEvent
 			| SendTransactionDoneEvent,
@@ -64,20 +68,19 @@ export const solanaWalletMachine = setup({
 			async ({
 				input,
 			}: {
-				input: { wallet: Solflare | null };
+				input: { wallet: Solflare | null, amount: number };
 			}) => {
 				if (!input.wallet) throw new Error("No wallet found");
 				if (!input.wallet.publicKey) throw new Error("No public key found");
-
+				if (input.amount == null || input.amount < 0) throw new Error("Please enter a valid amount");
 				const connection = new Connection(SOLANA_DEVNET);
 				const { blockhash, lastValidBlockHeight } =
 					await connection.getLatestBlockhash();
-
 				const transaction = new Transaction().add(
 					SystemProgram.transfer({
 						fromPubkey: input.wallet.publicKey,
 						toPubkey: input.wallet.publicKey,
-						lamports: 0,
+						lamports: input.amount * LAMPORTS_PER_SOL,
 					}),
 				);
 				transaction.feePayer = input.wallet.publicKey;
@@ -141,7 +144,13 @@ export const solanaWalletMachine = setup({
 				DISCONNECT: {
 					target: "DISCONNECTING",
 				},
-				SEND_TRANSACTION: "SENDING_TRANSACTION",
+				TRANSACTION_MODAL: "TRANSACTION_MODAL",
+			},
+		},
+		TRANSACTION_MODAL: {
+			on: {
+				SENDING_TRANSACTION: "SENDING_TRANSACTION",
+				CANCEL: "CONNECTED",
 			},
 		},
 		DISCONNECTING: {
@@ -168,11 +177,20 @@ export const solanaWalletMachine = setup({
 			invoke: {
 				id: "sendTransaction",
 				src: "sendTransaction",
-				input: ({ context }) => ({
-					wallet: context.wallet,
-				}),
+				input: ({ context, event }) => {
+					if (event.type === "SENDING_TRANSACTION") {
+						return {
+							wallet: context.wallet,
+							amount: event.data.amount,
+						};
+					}
+					return {
+						wallet: context.wallet,
+						amount: 0
+					};
+				},
 				onDone: {
-					target: "TRANSACTION_SENT",
+					target: "CONNECTED",
 					actions: assign({
 						transactionSignature: ({ context, event }) =>
 							event.output.signature || context.transactionSignature,
@@ -183,17 +201,9 @@ export const solanaWalletMachine = setup({
 				},
 			},
 		},
-		TRANSACTION_SENT: {
-			on: {
-				DISCONNECT: {
-					target: "DISCONNECTING",
-				},
-				SEND_TRANSACTION: "SENDING_TRANSACTION",
-			},
-		},
 		ERROR: {
 			on: {
-				RETRY: "CONNECTING",
+				RETRY: "DISCONNECTED",
 			},
 		},
 	},
