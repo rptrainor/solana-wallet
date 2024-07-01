@@ -3,25 +3,25 @@
 import { type FC, useEffect } from "react";
 import { DialogTitle } from "@headlessui/react";
 
-import { useSolanaWallet } from "~/context/SolanaWalletContext";	
+import { useSolanaWallet } from "~/context/SolanaWalletContext";
 import Hero from "./Hero";
 import Menu from "./Menu";
 import Modal from "./Modal";
 import type { SolanaWalletEvent } from "~/machines/solanaWalletMachine";
 
 const STATUS_DICTIONARY: Record<SolanaWalletEvent["type"], string> = {
-  CONNECTING: "Connecting to network",
-  CONNECTED: "Connected to network",
+	CONNECTING: "Connecting to network",
+	CONNECTED: "Connected to network",
 	CONNECT: "Connecting to network",
-  DISCONNECTING: "Disconnecting from network",
-  DISCONNECTED: "Disconnected from network",
-  SENDING_TRANSACTION: "Sending transaction",
-  ERROR: "Error",
-  TRANSACTION_MODAL: "Transaction Modal Open",
-  CANCEL: "Transaction Canceled",
-  RETRY: "Retrying Connection",
-  "done.invoke.connectWallet": "Connected to network",
-  "done.invoke.sendTransaction": "Transaction Sent",
+	DISCONNECTING: "Disconnecting from network",
+	DISCONNECTED: "Disconnected from network",
+	SENDING_TRANSACTION: "Sending transaction",
+	ERROR: "Error",
+	TRANSACTION_MODAL: "Transaction Modal Open",
+	CANCEL: "Transaction Canceled",
+	RETRY: "Retrying Connection",
+	"done.invoke.connectWallet": "Connected to network",
+	"done.invoke.sendTransaction": "Transaction Sent",
 };
 
 const WalletDetails: FC = () => {
@@ -54,15 +54,15 @@ const WalletDetails: FC = () => {
 								{(context.balance !== null ||
 									value === "CONNECTING" ||
 									value === "SENDING_TRANSACTION") && (
-									<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
-										<dd className="order-first text-lg font-semibold tracking-tight text-white">
-											{context.balance} SOL
-										</dd>
-										<dt className="text-sm font-semibold leading-6 text-gray-300">
-											balance
-										</dt>
-									</div>
-								)}
+										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
+											<dd className="order-first text-lg font-semibold tracking-tight text-white">
+												{context.balance} SOL
+											</dd>
+											<dt className="text-sm font-semibold leading-6 text-gray-300">
+												balance
+											</dt>
+										</div>
+									)}
 								{(value !== "CONNECTING" ||
 									value === "CONNECTING" ||
 									value === "SENDING_TRANSACTION") &&
