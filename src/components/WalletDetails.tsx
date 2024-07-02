@@ -13,6 +13,7 @@ const STATUS_DICTIONARY: Record<SolanaWalletEvent["type"], string> = {
 	CONNECTING: "Connecting to network",
 	CONNECTED: "Connected to network",
 	CONNECT: "Connecting to network",
+	DISCONNECT: "Disconnecting from network",
 	DISCONNECTING: "Disconnecting from network",
 	DISCONNECTED: "Disconnected from network",
 	SENDING_TRANSACTION: "Sending transaction",

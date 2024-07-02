@@ -16,6 +16,7 @@ export interface SolanaWalletContext {
 }
 
 export type SolanaWalletEvent =
+	| { type: "DISCONNECT" }
 	| { type: "DISCONNECTED" }
 	| { type: "CONNECT" }
 	| { type: "CONNECTING" }
