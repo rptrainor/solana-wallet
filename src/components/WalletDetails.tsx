@@ -46,7 +46,7 @@ const WalletDetails: FC = () => {
 		<>
 			<div>
 				<div className="flex flex-col sm:flex-row-reverse gap-4">
-					<Menu />
+					{value !== 'SENDING_TRANSACTION' && value !== 'CONNECTING' && <Menu />}
 					<div className="flex flex-col gap-4 grow">
 						{value === "DISCONNECTED" && <Hero />}
 						{value !== "ERROR" && value !== "DISCONNECTED" && (
@@ -67,16 +67,16 @@ const WalletDetails: FC = () => {
 									value === "CONNECTING" ||
 									value === "SENDING_TRANSACTION") &&
 									context.transactionSignature && (
-										<a href={`https://solscan.io/tx/${context.transactionSignature}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
-											<dl className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
-												<dt className="text-sm font-semibold leading-6 text-gray-300">
-													last transaction signature
-												</dt>
-												<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
+										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
+											<dt className="text-sm font-semibold leading-6 text-gray-300">
+												last transaction signature
+											</dt>
+											<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
+												<a href={`https://solscan.io/tx/${context.transactionSignature}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
 													{context.transactionSignature}
-												</dd>
-											</dl>
-										</a>
+												</a>
+											</dd>
+										</div>
 									)}
 								<div
 									className={

@@ -6,7 +6,6 @@ import {
 	SystemProgram,
 	LAMPORTS_PER_SOL,
 	type TransactionSignature,
-	type Commitment,
 } from "@solana/web3.js";
 import { toast } from "sonner";
 
