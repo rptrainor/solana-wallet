@@ -1,6 +1,6 @@
 "use client";
 
-import { type FC, useEffect } from "react";
+import type { FC } from "react";
 import { DialogTitle } from "@headlessui/react";
 
 import { useSolanaWallet } from "~/context/SolanaWalletContext";
@@ -36,55 +36,52 @@ const WalletDetails: FC = () => {
 		console.log("Submitted");
 	};
 
-	useEffect(() => {
-		console.log({
-			context,
-			value,
-		});
-	}, [context, value]);
+	const isDisconnected = value === "DISCONNECTED";
+	const isError = value === "ERROR";
+	const isModalOpen = value === "TRANSACTION_MODAL";
+	const updating = value === "SENDING_TRANSACTION" || value === "CONNECTING";
+	const isConnected = value === "CONNECTED";
+	const isConnectedOrModalOpen = isConnected || value === "TRANSACTION_MODAL";
 
 	return (
 		<>
 			<div>
 				<div className="flex flex-col sm:flex-row-reverse gap-4">
-					{value !== 'SENDING_TRANSACTION' && value !== 'CONNECTING' && <Menu />}
+					{isConnectedOrModalOpen && <Menu />}
 					<div className="flex flex-col gap-4 grow">
-						{value === "DISCONNECTED" && <Hero />}
-						{value !== "ERROR" && value !== "DISCONNECTED" && (
-							<dl className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center mx-auto max-w-4xl w-full">
-								{context.balance !== null &&
-									value !== "CONNECTING" &&
-									value !== "SENDING_TRANSACTION" && (
-										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
-											<dd className="order-first text-lg font-semibold tracking-tight text-white">
-												{context.balance} SOL
-											</dd>
-											<dt className="text-sm font-semibold leading-6 text-gray-300">
-												balance
-											</dt>
-										</div>
-									)}
-								{(value !== "CONNECTING" ||
-									value === "CONNECTING" ||
-									value === "SENDING_TRANSACTION") &&
-									context.transactionSignature && (
-										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
-											<dt className="text-sm font-semibold leading-6 text-gray-300">
-												last transaction signature
-											</dt>
-											<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
-												<a href={`https://solscan.io/tx/${context.transactionSignature}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
-													{context.transactionSignature}
-												</a>
-											</dd>
-										</div>
-									)}
+						{isDisconnected && <Hero />}
+
+						<dl className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center mx-auto max-w-4xl w-full">
+							{isConnected && (
+								<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
+									<dd className="order-first text-lg font-semibold tracking-tight text-white">
+										{context.balance} SOL
+									</dd>
+									<dt className="text-sm font-semibold leading-6 text-gray-300">
+										balance
+									</dt>
+								</div>
+							)}
+
+							{isConnectedOrModalOpen && context.transactionSignature && (
+								<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
+									<dt className="text-sm font-semibold leading-6 text-gray-300">
+										last transaction signature
+									</dt>
+									<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
+										<a
+											href={`https://solscan.io/tx/${context.transactionSignature}?cluster=devnet`}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{context.transactionSignature}
+										</a>
+									</dd>
+								</div>
+							)}
+							{!isDisconnected && !isModalOpen && (
 								<div
-									className={
-										value === "CONNECTING" || value === "SENDING_TRANSACTION"
-											? "animate-pulse rounded-md bg-white/5 flex flex-col xs:p-8"
-											: "flex flex-col bg-white/5 xs:p-8 py-2 px-4"
-									}
+									className={`flex flex-col ${updating ? "animate-pulse" : ""} bg-white/5 xs:p-8 py-2 px-4`}
 								>
 									<dt className="text-sm font-semibold leading-6 text-gray-300">
 										connection status
@@ -93,13 +90,13 @@ const WalletDetails: FC = () => {
 										{STATUS_DICTIONARY[value as SolanaWalletEvent["type"]]}
 									</dd>
 								</div>
-							</dl>
-						)}
+							)}
+						</dl>
 					</div>
 				</div>
 			</div>
 
-			<Modal open={value === "ERROR"} setOpen={() => send({ type: "RETRY" })}>
+			<Modal open={isError} setOpen={() => send({ type: "RETRY" })}>
 				<div>
 					<div className="mx-auto flex h-8 w-8 xs:h-12 xs:w-12 items-center justify-center rounded-full bg-slate-300">
 						<svg
@@ -137,10 +134,7 @@ const WalletDetails: FC = () => {
 				</div>
 			</Modal>
 
-			<Modal
-				open={value === "TRANSACTION_MODAL"}
-				setOpen={() => send({ type: "RETRY" })}
-			>
+			<Modal open={isModalOpen} setOpen={() => send({ type: "RETRY" })}>
 				<form onSubmit={handleSubmit}>
 					<div>
 						<div className="border-b border-slate-800/10 pb-4 xs:pb-12">

@@ -125,7 +125,7 @@ export const solanaWalletMachine = setup({
 					});
 					return { signature, balance: newBalance / 1e9 };
 				} catch (error) {
-					toast.error("Transaction failed");
+					toast.error("Transaction cancelled");
 					throw error;
 				}
 			},
