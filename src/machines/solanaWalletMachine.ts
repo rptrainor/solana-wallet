@@ -49,13 +49,14 @@ export const solanaWalletMachine = setup({
 
 				const connection = new Connection(SOLANA_DEVNET);
 				const newBalance = await connection.getBalance(wallet.publicKey);
+				console.log({ newBalance });
 				toast.success('Connected to wallet', {
 					description: `Balance: ${newBalance / 1e9} SOL`,
 				});
 
 				return { wallet, balance: newBalance / 1e9 };
 			} catch (error) {
-				toast.error('Wallet disconnected');
+				toast.info('Wallet disconnected');
 				throw error;
 			}
 		}),
@@ -100,7 +101,9 @@ export const solanaWalletMachine = setup({
 						blockhash,
 						lastValidBlockHeight,
 					});
+					new Promise((resolve) => setTimeout(resolve, 1000));
 					const newBalance = await connection.getBalance(input.wallet.publicKey);
+					console.log({ newBalance });
 					toast.success('Transaction confirmed', {
 						description: `your balance is now ${newBalance / 1e9} SOL`,
 					});
@@ -150,7 +153,7 @@ export const solanaWalletMachine = setup({
 					}),
 				},
 				onError: {
-					target: "ERROR",
+					target: "DISCONNECTED",
 				},
 			},
 		},
@@ -214,7 +217,7 @@ export const solanaWalletMachine = setup({
 					}),
 				},
 				onError: {
-					target: "ERROR",
+					target: "CONNECTED",
 				},
 			},
 		},

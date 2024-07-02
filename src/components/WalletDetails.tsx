@@ -67,14 +67,16 @@ const WalletDetails: FC = () => {
 									value === "CONNECTING" ||
 									value === "SENDING_TRANSACTION") &&
 									context.transactionSignature && (
-										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
-											<dt className="text-sm font-semibold leading-6 text-gray-300">
-												last transaction signature
-											</dt>
-											<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
-												{context.transactionSignature}
-											</dd>
-										</div>
+										<a href={`https://solscan.io/tx/${context.transactionSignature}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
+											<dl className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
+												<dt className="text-sm font-semibold leading-6 text-gray-300">
+													last transaction signature
+												</dt>
+												<dd className="order-first text-lg font-semibold tracking-tight text-white text-wrap break-words">
+													{context.transactionSignature}
+												</dd>
+											</dl>
+										</a>
 									)}
 								<div
 									className={
