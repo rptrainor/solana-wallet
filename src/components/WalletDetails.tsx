@@ -51,9 +51,9 @@ const WalletDetails: FC = () => {
 						{value === "DISCONNECTED" && <Hero />}
 						{value !== "ERROR" && value !== "DISCONNECTED" && (
 							<dl className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center mx-auto max-w-4xl w-full">
-								{(context.balance !== null ||
-									value === "CONNECTING" ||
-									value === "SENDING_TRANSACTION") && (
+								{context.balance !== null &&
+									value !== "CONNECTING" &&
+									value !== "SENDING_TRANSACTION" && (
 										<div className="flex flex-col bg-white/5 xs:p-8 py-2 px-4">
 											<dd className="order-first text-lg font-semibold tracking-tight text-white">
 												{context.balance} SOL
@@ -95,6 +95,7 @@ const WalletDetails: FC = () => {
 					</div>
 				</div>
 			</div>
+
 			<Modal open={value === "ERROR"} setOpen={() => send({ type: "RETRY" })}>
 				<div>
 					<div className="mx-auto flex h-8 w-8 xs:h-12 xs:w-12 items-center justify-center rounded-full bg-slate-300">
@@ -113,11 +114,11 @@ const WalletDetails: FC = () => {
 							as="h3"
 							className="text-sm xs:text-base font-semibold leading-6 text-slate-900"
 						>
-							Opps! Something went wrong
+							Wallet Disconnected
 						</DialogTitle>
 						<div className="mt-2">
 							<p className="text-xs xs:text-sm text-slate-500 text-start sm:text-center text-balance">
-								Please try to reconnect to your wallet.
+								We were unable to connect to your wallet. Please try again.
 							</p>
 						</div>
 					</div>
@@ -128,7 +129,7 @@ const WalletDetails: FC = () => {
 						className="inline-flex w-full justify-center rounded-md bg-slate-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600"
 						onClick={() => send({ type: "RETRY" })}
 					>
-						Reconnect
+						Back
 					</button>
 				</div>
 			</Modal>

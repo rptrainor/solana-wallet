@@ -29,7 +29,7 @@ export type SolanaWalletEvent =
 	| { type: "done.invoke.connectWallet"; data: { wallet: Solflare; balance: number; connection: Connection } }
 	| { type: "done.invoke.sendTransaction"; data: { signature: TransactionSignature } };
 
-const SOLANA_DEVNET = "https://api.testnet.solana.com/";
+const SOLANA_DEVNET = "https://api.devnet.solana.com/";
 
 export const solanaWalletMachine = setup({
 	types: {
@@ -38,21 +38,28 @@ export const solanaWalletMachine = setup({
 	},
 	actors: {
 		connectWallet: fromPromise(async () => {
-			const wallet = new Solflare({ network: "devnet" });
-			await wallet.connect();
+			try {
+				const wallet = new Solflare({ network: "devnet" });
+				await wallet.connect();
 
-			if (!wallet.publicKey) {
-				toast.error('No public key found');
-				throw new Error("No public key found");
-			};
+				if (!wallet.publicKey) {
+					toast.error('No public key found');
+					throw new Error("No public key found");
+				}
 
-			const connection = new Connection(SOLANA_DEVNET);
-			const newBalance = await connection.getBalance(wallet.publicKey);
-			toast.success('Connected to wallet', {
-				description: `Balance: ${newBalance / 1e9} SOL`,
-			});
-			return { wallet, balance: newBalance / 1e9 };
+				const connection = new Connection(SOLANA_DEVNET);
+				const newBalance = await connection.getBalance(wallet.publicKey);
+				toast.success('Connected to wallet', {
+					description: `Balance: ${newBalance / 1e9} SOL`,
+				});
+
+				return { wallet, balance: newBalance / 1e9 };
+			} catch (error) {
+				toast.error('Wallet disconnected');
+				throw error;
+			}
 		}),
+
 		sendTransaction: fromPromise(
 			async ({
 				input,
@@ -87,19 +94,20 @@ export const solanaWalletMachine = setup({
 				try {
 					const signature =
 						await input.wallet.signAndSendTransaction(transaction);
+					toast.info('Confirming transaction...')
 					await connection.confirmTransaction({
 						signature,
 						blockhash,
 						lastValidBlockHeight,
 					});
 					const newBalance = await connection.getBalance(input.wallet.publicKey);
-					toast.success('Transaction sent', {
+					toast.success('Transaction confirmed', {
 						description: `your balance is now ${newBalance / 1e9} SOL`,
 					});
 					return { signature, balance: newBalance / 1e9 };
 				} catch (error) {
 					toast.error('Transaction failed');
-					throw new Error("Transaction failed");
+					throw error;
 				}
 			},
 		),
@@ -110,7 +118,7 @@ export const solanaWalletMachine = setup({
 				return { wallet: null, balance: null, transactionSignature: null };
 			} catch (error) {
 				toast.error('Disconnection failed');
-				throw new Error("Disconnection failed");
+				throw error;
 			}
 		}),
 	},
