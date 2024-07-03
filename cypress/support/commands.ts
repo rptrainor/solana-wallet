@@ -1,37 +1,44 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+import '../../src/app/globals.css';
+import { mount } from 'cypress/react18';
+import * as solanaWalletStore from '~/stores/solanaWalletStore';
+import type { SolanaWalletContext, SolanaWalletEvent } from '~/machines/solanaWalletMachine';
+import Solflare from '@solflare-wallet/sdk';
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Custom command to stub the Solana Wallet store.
+       * @example cy.stubSolanaWalletStore('CONNECTED', { balance: 100 })
+       */
+      stubSolanaWalletStore(
+        stateValue: SolanaWalletEvent['type'] | 'DISCONNECTED' | 'ERROR' | 'TRANSACTION_MODAL' | 'SENDING_TRANSACTION' | 'CONNECTED',
+        contextOverrides?: Partial<SolanaWalletContext>
+      ): Chainable<void>;
+    }
+  }
+}
+
+Cypress.Commands.add('mount', mount);
+
+Cypress.Commands.add('stubSolanaWalletStore', (
+  stateValue: SolanaWalletEvent['type'] | 'DISCONNECTED' | 'ERROR' | 'TRANSACTION_MODAL' | 'SENDING_TRANSACTION' | 'CONNECTED',
+  contextOverrides: Partial<SolanaWalletContext> = {}
+) => {
+  const initialContext: SolanaWalletContext = {
+    balance: 100,
+    transactionSignature: 'null',
+    wallet: new Solflare({ network: 'devnet' })
+  };
+  const context: SolanaWalletContext = { ...initialContext, ...contextOverrides };
+  const sendStub = cy.stub().as('sendStub');
+  const solanaWalletMachineStub = {
+    context,
+    value: stateValue,
+    send: sendStub,
+  };
+
+  cy.stub(solanaWalletStore, 'useSolanaWalletMachine').returns(solanaWalletMachineStub);
+  cy.log('Stubbed useSolanaWalletMachine:', solanaWalletMachineStub);
+});

@@ -28,7 +28,6 @@ const STATUS_DICTIONARY: Record<SolanaWalletEvent["type"], string> = {
 
 const WalletDetails: FC = () => {
   const { context, value, send } = useSolanaWalletMachine();
-	// const { context, value, send } = state;
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget);

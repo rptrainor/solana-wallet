@@ -1,13 +1,16 @@
 import type { ComponentProps, FC } from "react";
+import clsx from 'clsx';
 
-const Button: FC<ComponentProps<"button">> = ({ children, ...restOfProps }) => {
+const Button: FC<ComponentProps<"button">> = ({ children, className, ...restOfProps }) => {
   return (
     <button
       {...restOfProps}
       type="button"
-      className="group/button relative inline-flex items-center justify-center overflow-hidden bg-yellow-500 p-2 w-8 h-8 rounded-full text-xs font-normal text-black transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30 drop-shadow-2xl border-black border-2"
+      className={clsx(
+        "group/button relative inline-flex items-center justify-center overflow-hidden bg-yellow-500 p-2 w-8 h-8 rounded-full text-xs font-normal text-black transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30 drop-shadow-2xl border-black border-2",
+        className
+      )}
     >
-
       <span className="text-lg font-bold">
         {children}
       </span>
@@ -19,4 +22,3 @@ const Button: FC<ComponentProps<"button">> = ({ children, ...restOfProps }) => {
 }
 
 export default Button;
-
