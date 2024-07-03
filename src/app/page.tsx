@@ -4,11 +4,7 @@ import type React from "react";
 import WalletDetails from "~/components/WalletDetails";
 
 const App: React.FC = () => {
-	return (
-		<>
-			<WalletDetails />
-		</>
-	);
+	return (<WalletDetails />);
 };
 
 export default App;
