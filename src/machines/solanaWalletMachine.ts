@@ -59,7 +59,6 @@ export const solanaWalletMachine = setup({
 					wallet.publicKey,
 					"finalized",
 				);
-				console.log({ newBalance });
 				toast.success("Connected to wallet", {
 					description: `Balance: ${newBalance / 1e9} SOL`,
 				});
@@ -119,7 +118,6 @@ export const solanaWalletMachine = setup({
 						input.wallet.publicKey,
 						"finalized",
 					);
-					console.log({ newBalance });
 					toast.success("Transaction confirmed", {
 						description: `Your balance is now ${newBalance / 1e9} SOL`,
 					});
