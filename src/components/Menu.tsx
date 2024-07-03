@@ -1,8 +1,8 @@
-import { useSolanaWallet } from "~/context/SolanaWalletContext";
+import { useSolanaWalletStore } from "~/stores/solanaWalletStore";
 import Button from "./Button";
 
 const Menu = () => {
-  const { send } = useSolanaWallet();
+  const { send } = useSolanaWalletStore();
 
   return (
     <div className="flex flex-row sm:flex-col items-center justify-end sm:justify-start gap-4">

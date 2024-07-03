@@ -1,7 +1,8 @@
-import { useSolanaWallet } from "~/context/SolanaWalletContext";
+import { useSolanaWalletStore } from "~/stores/solanaWalletStore";
 
 const Hero = () => {
-  const { send } = useSolanaWallet();
+  const { send } = useSolanaWalletStore();
+
 
   return (
     <div className="relative isolate overflow-hidden bg-slate-800 rounded">

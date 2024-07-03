@@ -1,9 +1,10 @@
 "use client";
 
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 import { DialogTitle } from "@headlessui/react";
 
-import { useSolanaWallet } from "~/context/SolanaWalletContext";
+import { useSolanaWalletMachine } from "~/stores/solanaWalletStore";
+
 import Hero from "./Hero";
 import Menu from "./Menu";
 import Modal from "./Modal";
@@ -26,8 +27,8 @@ const STATUS_DICTIONARY: Record<SolanaWalletEvent["type"], string> = {
 };
 
 const WalletDetails: FC = () => {
-	const { context, value, send } = useSolanaWallet();
-
+  const { context, value, send } = useSolanaWalletMachine();
+	// const { context, value, send } = state;
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget);
@@ -43,6 +44,12 @@ const WalletDetails: FC = () => {
 	const isConnected = value === "CONNECTED";
 	const isConnectedOrModalOpen = isConnected || value === "TRANSACTION_MODAL";
 
+	useEffect(() => {
+		console.log({
+			value,
+			context
+		});
+	}, [value, context]);
 	return (
 		<>
 			<div>
